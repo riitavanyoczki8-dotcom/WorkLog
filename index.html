@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Work Log</title>
+    <style>
+        :root {
+            --accent-color: #fca311;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a5;
+            --danger: #ff453a;
+            --success: #32d74b;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px 15px 100px 15px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #121212 0%, #1c1c1e 50%, #000000 100%);
+            background-attachment: fixed;
+            color: var(--text-main);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            letter-spacing: 0.5px;
+            background: linear-gradient(90deg, #fff, var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Glassmorphism Classes */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .top-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+
+        button {
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            padding: 12px;
+            transition: opacity 0.2s;
+        }
+
+        button:active {
+            opacity: 0.7;
+        }
+
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: #000;
+            width: 100%;
+            margin-top: 15px;
+            font-size: 17px;
+            padding: 14px;
+        }
+
+        /* Forms & Inputs */
+        .input-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .input-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            margin-left: 4px;
+        }
+
+        input, select {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--text-main);
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 16px;
+            color-scheme: dark;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent-color);
+        }
+
+        /* Inline summary inputs for Tips & Housing */
+        .inline-input {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            padding: 4px 8px;
+            border-radius: 8px;
+            width: 80px;
+            text-align: right;
+            font-size: 14px;
+            outline: none;
+        }
+        
+        .inline-input:focus {
+            border-color: var(--accent-color);
+        }
+
+        /* Week Header & Collapsible */
+        .week-header {
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .week-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .week-header-border {
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+
+        .chevron {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        /* Summaries */
+        .week-summary {
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 15px;
+            color: var(--text-muted);
+            align-items: center;
+        }
+
+        .summary-row.total {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0;
+        }
+
+        .collapsed-summary {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        /* Lists and Items */
+        .shift-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .shift-item {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .shift-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .shift-date {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .shift-time {
+            font-size: 17px;
+            font-weight: 500;
+        }
+
+        .shift-role {
+            font-size: 12px;
+            color: var(--accent-color);
+            background: rgba(252, 163, 17, 0.15);
+            padding: 2px 8px;
+            border-radius: 10px;
+            display: inline-block;
+            width: fit-content;
+        }
+
+        .shift-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 5px;
+        }
+
+        .shift-pay {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .btn-delete {
+            background: none;
+            color: var(--danger);
+            padding: 5px;
+            font-size: 20px;
+            margin: 0;
+        }
+
+        .ot-indicator {
+            font-size: 11px;
+            color: var(--danger);
+            border: 1px solid var(--danger);
+            padding: 2px 6px;
+            border-radius: 6px;
+            margin-top: 4px;
+        }
+
+        .hidden { display: none !important; }
+        .text-accent { color: var(--accent-color) !important; }
+    </style>
+</head>
+<body>
+
+    <h1>Work Log</h1>
+
+    <div class="top-controls">
+        <button class="btn-outline" onclick="manageProfiles()">⚙️ Positions</button>
+        <button class="btn-outline" onclick="startNewWeek()">📅 New Week</button>
+    </div>
+
+    <div id="inputSection" class="glass-card hidden">
+        <div class="week-header-top" style="margin-bottom: 15px; justify-content: center;">
+            <span id="activeWeekTitle" style="color: var(--text-main); font-size: 16px;">Current Week</span>
+        </div>
+        
+        <div class="input-row">
+            <div class="input-group" style="flex: 1.5;">
+                <label>Date</label>
+                <input type="date" id="dateInput">
+            </div>
+            <div class="input-group" style="flex: 2;">
+                <label>Position</label>
+                <select id="profileSelect"></select>
+            </div>
+        </div>
+
+        <div class="input-row">
+            <div class="input-group">
+                <label>Start</label>
+                <input type="time" id="startInput">
+            </div>
+            <div class="input-group">
+                <label>End</label>
+                <input type="time" id="endInput">
+            </div>
+        </div>
+
+        <button class="btn-primary" onclick="addShift()">Add Shift</button>
+    </div>
+
+    <div id="weeksContainer"></div>
+
+    <script>
+        // --- DATA STRUCTURE (v4 clean wipe) ---
+        let profiles = JSON.parse(localStorage.getItem('workLogProfiles_v4')) || [];
+        let weeks = JSON.parse(localStorage.getItem('workLogWeeks_v4')) || [];
+        let activeWeekId = weeks.length > 0 ? weeks[0].id : null;
+
+        document.getElementById('dateInput').valueAsDate = new Date();
+
+        function saveData() {
+            localStorage.setItem('workLogWeeks_v4', JSON.stringify(weeks));
+            localStorage.setItem('workLogProfiles_v4', JSON.stringify(profiles));
+        }
+
+        // --- CORE FUNCTIONS ---
+
+        function manageProfiles() {
+            const name = prompt("Enter new position name (e.g., Server):");
+            if (!name) return;
+            
+            const wage = parseFloat(prompt(`Hourly wage for ${name}? ($)`).replace(',', '.'));
+            if (isNaN(wage)) return alert("Invalid amount.");
+            
+            const defaultOt = (wage * 1.86).toFixed(2);
+            const otWage = parseFloat(prompt(`Overtime wage? (Default 1.86x multiplier)`, defaultOt).replace(',', '.'));
+            if (isNaN(otWage)) return alert("Invalid amount.");
+
+            profiles.push({ id: Date.now().toString(), name, wage, otWage });
+            saveData();
+            renderUI();
+        }
+
+        function startNewWeek() {
+            const title = prompt("Name this week (e.g., June 29 - July 5):");
+            if (!title) return;
+
+            const newWeek = {
+                id: Date.now().toString(),
+                title: title,
+                isCollapsed: false,
+                tips: 0,
+                housing: 0,
+                shifts: []
+            };
+
+            weeks.unshift(newWeek);
+            activeWeekId = newWeek.id;
+            saveData();
+            renderUI();
+        }
+
+        function addShift() {
+            if (profiles.length === 0) return alert("Please create a position (⚙️ Positions) first!");
+            if (!activeWeekId) return alert("Please create a New Week first!");
+
+            const date = document.getElementById('dateInput').value;
+            const profileId = document.getElementById('profileSelect').value;
+            const start = document.getElementById('startInput').value;
+            const end = document.getElementById('endInput').value;
+
+            if (!date || !start || !end) return alert("Please fill in all time fields.");
+
+            const startTime = new Date(`1970-01-01T${start}:00`);
+            const endTime = new Date(`1970-01-01T${end}:00`);
+            let diffMins = (endTime - startTime) / 1000 / 60;
+            if (diffMins < 0) diffMins += 24 * 60; 
+
+            const activeWeek = weeks.find(w => w.id === activeWeekId);
+            activeWeek.shifts.push({
+                id: Date.now().toString(),
+                date, profileId, start, end, minutes: diffMins
+            });
+            
+            activeWeek.isCollapsed = false;
+
+            saveData();
+            renderUI();
+
+            document.getElementById('startInput').value = '';
+            document.getElementById('endInput').value = '';
+        }
+
+        function deleteShift(weekId, shiftId) {
+            if(!confirm("Delete this shift?")) return;
+            const week = weeks.find(w => w.id === weekId);
+            week.shifts = week.shifts.filter(s => s.id !== shiftId);
+            saveData();
+            renderUI();
+        }
+
+        function toggleWeek(weekId) {
+            const week = weeks.find(w => w.id === weekId);
+            week.isCollapsed = !week.isCollapsed;
+            saveData();
+            renderUI();
+        }
+
+        function updateWeekExtras(weekId, field, value) {
+            const week = weeks.find(w => w.id === weekId);
+            if (week) {
+                week[field] = parseFloat(value) || 0;
+                saveData();
+                renderUI();
+            }
+        }
+
+        // --- RENDER LOGIC ---
+
+        function renderUI() {
+            const select = document.getElementById('profileSelect');
+            const currentVal = select.value;
+            select.innerHTML = '';
+            
+            if (profiles.length === 0) {
+                const opt = document.createElement('option');
+                opt.value = "";
+                opt.textContent = "-- Create Position First --";
+                select.appendChild(opt);
+                select.disabled = true;
+            } else {
+                select.disabled = false;
+                profiles.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.id;
+                    opt.textContent = `${p.name} ($${p.wage})`;
+                    select.appendChild(opt);
+                });
+                if (currentVal && profiles.some(p => p.id === currentVal)) select.value = currentVal;
+            }
+
+            const inputSection = document.getElementById('inputSection');
+            if (weeks.length === 0) {
+                inputSection.classList.add('hidden');
+                document.getElementById('weeksContainer').innerHTML = `<div class="glass-card" style="text-align:center; color: var(--text-muted);">Tap "New Week" to start tracking.</div>`;
+                return;
+            } else {
+                inputSection.classList.remove('hidden');
+                activeWeekId = weeks[0].id;
+                document.getElementById('activeWeekTitle').textContent = `Adding to: ${weeks[0].title}`;
+            }
+
+            const container = document.getElementById('weeksContainer');
+            container.innerHTML = '';
+
+            weeks.forEach((week, index) => {
+                const isLatest = index === 0;
+
+                week.shifts.sort((a, b) => new Date(a.date + 'T' + a.start) - new Date(b.date + 'T' + b.start));
+
+                let cumulativeMinutes = 0;
+                let totalWeekPay = 0;
+                let totalOTMinutes = 0;
+                let shiftsHTML = '';
+
+                week.shifts.forEach(shift => {
+                    const profile = profiles.find(p => p.id === shift.profileId) || {name: 'Deleted', wage: 0, otWage: 0};
+                    
+                    let regMins = 0;
+                    let otMins = 0;
+                    
+                    if (cumulativeMinutes >= 2400) {
+                        otMins = shift.minutes;
+                    } else if (cumulativeMinutes + shift.minutes > 2400) {
+                        regMins = 2400 - cumulativeMinutes;
+                        otMins = shift.minutes - regMins;
+                    } else {
+                        regMins = shift.minutes;
+                    }
+
+                    cumulativeMinutes += shift.minutes;
+                    totalOTMinutes += otMins;
+
+                    const shiftPay = (regMins / 60) * profile.wage + (otMins / 60) * profile.otWage;
+                    totalWeekPay += shiftPay;
+
+                    const [y, m, d_day] = shift.date.split('-');
+                    const d = new Date(y, m - 1, d_day);
+                    const dateStr = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+
+                    shiftsHTML += `
+                        <div class="shift-item">
+                            <div class="shift-info">
+                                <span class="shift-date">${dateStr}</span>
+                                <span class="shift-role">${profile.name}</span>
+                                <span class="shift-time">${shift.start} - ${shift.end}</span>
+                                ${otMins > 0 ? `<span class="ot-indicator">Includes OT</span>` : ''}
+                            </div>
+                            <div class="shift-right">
+                                <button class="btn-delete" onclick="deleteShift('${week.id}', '${shift.id}')">✕</button>
+                                <span class="shift-pay">$${shiftPay.toFixed(2)}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                const totalHours = Math.floor(cumulativeMinutes / 60);
+                const totalMins = cumulativeMinutes % 60;
+                const otHours = Math.floor(totalOTMinutes / 60);
+                const otRemainingMins = totalOTMinutes % 60;
+
+                // Net Pay számítás (Gross + Tips - Housing)
+                const weekTips = week.tips || 0;
+                const weekHousing = week.housing || 0;
+                const netWeekPay = totalWeekPay + weekTips - weekHousing;
+
+                const headerClass = week.isCollapsed ? "week-header" : "week-header week-header-border";
+                const chevronIcon = week.isCollapsed ? "▼" : "▲";
+                
+                let headerContent = `
+                    <div class="week-header-top">
+                        <span>🗓 ${week.title}</span>
+                        <div style="display:flex; align-items:center; gap: 10px;">
+                            ${isLatest ? `<span style="font-size: 12px; color: var(--success); font-weight: normal;">Active</span>` : ''}
+                            <span class="chevron">${chevronIcon}</span>
+                        </div>
+                    </div>
+                `;
+
+                if (week.isCollapsed) {
+                    headerContent += `
+                        <div class="collapsed-summary">
+                            <span>⏱ ${totalHours}h ${totalMins}m</span>
+                            <span class="text-accent">💰 $${netWeekPay.toFixed(2)}</span>
+                        </div>
+                    `;
+                }
+
+                let expandedContent = '';
+                if (!week.isCollapsed) {
+                    expandedContent = `
+                        <div class="week-summary">
+                            <div class="summary-row">
+                                <span>Total Time:</span>
+                                <span style="color: white; font-weight: 500;">${totalHours}h ${totalMins}m</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Overtime (40h+):</span>
+                                <span class="${totalOTMinutes > 0 ? 'text-accent' : ''}">${otHours}h ${otRemainingMins}m</span>
+                            </div>
+                            <div class="summary-row" style="border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 8px;">
+                                <span>Gross Pay:</span>
+                                <span style="color: white;">$${totalWeekPay.toFixed(2)}</span>
+                            </div>
+                            <div class="summary-row" onclick="event.stopPropagation()">
+                                <span>Tips Received (+):</span>
+                                <input type="number" class="inline-input" placeholder="0.00" value="${weekTips > 0 ? weekTips : ''}" step="0.01" onchange="updateWeekExtras('${week.id}', 'tips', this.value)">
+                            </div>
+                            <div class="summary-row" onclick="event.stopPropagation()" style="padding-bottom: 4px;">
+                                <span>Housing Deduct (-):</span>
+                                <input type="number" class="inline-input" placeholder="0.00" value="${weekHousing > 0 ? weekHousing : ''}" step="0.01" style="color: var(--danger);" onchange="updateWeekExtras('${week.id}', 'housing', this.value)">
+                            </div>
+                            <div class="summary-row total">
+                                <span>Take-Home Pay:</span>
+                                <span class="text-accent">$${netWeekPay.toFixed(2)}</span>
+                            </div>
+                        </div>
+                        <div class="shift-list" onclick="event.stopPropagation()">
+                            ${shiftsHTML || '<div style="color:var(--text-muted); font-size: 14px; text-align:center;">No shifts added yet.</div>'}
+                        </div>
+                    `;
+                }
+
+                const weekHTML = `
+                    <div class="glass-card">
+                        <div class="${headerClass}" onclick="toggleWeek('${week.id}')">
+                            ${headerContent}
+                        </div>
+                        ${expandedContent}
+                    </div>
+                `;
+                
+                container.innerHTML += weekHTML;
+            });
+        }
+
+        renderUI();
+
+    </script>
+</body>
+</html>
